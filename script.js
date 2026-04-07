@@ -41,7 +41,28 @@ function toggleMode() {
 AFRAME.registerComponent('vr-controller', {
     init: function () {
         this.grabbedEl = null;
-        this.originalPos = null; // Speichert den Ort vor dem Greifen
+        this.originalPos = null;
+        this.originalRotY = 0; // Speichert die Drehung
+
+        // --- NEU: Globale Joystick-Daten direkt am Controller auslesen ---
+        this.el.addEventListener('axismove', (evt) => {
+            let axes = evt.detail.axis;
+            if (!axes || axes.length < 2) return;
+            
+            if (this.el.id === 'left-controller') {
+                window.moveY = Math.abs(axes[1]) > 0.1 ? axes[1] : 0;
+            } else if (this.el.id === 'right-controller') {
+                window.turnX = Math.abs(axes[0]) > 0.1 ? axes[0] : 0;
+            }
+        });
+
+        this.el.addEventListener('thumbstickmoved', (evt) => {
+            if (this.el.id === 'left-controller') {
+                window.moveY = Math.abs(evt.detail.y) > 0.1 ? evt.detail.y : 0;
+            } else if (this.el.id === 'right-controller') {
+                window.turnX = Math.abs(evt.detail.x) > 0.1 ? evt.detail.x : 0;
+            }
+        });
         
         const grabStart = () => {
             let raycaster = this.el.components.raycaster;
@@ -49,7 +70,6 @@ AFRAME.registerComponent('vr-controller', {
             
             let firstEl = raycaster.intersectedEls[0];
             
-            // 1. UI Buttons
             let clickableEl = firstEl.closest('.clickable');
             if (clickableEl && clickableEl.id === 'ok-button') {
                 document.getElementById('start-menu').setAttribute('visible', 'false');
@@ -57,15 +77,19 @@ AFRAME.registerComponent('vr-controller', {
                 return;
             }
 
-            // 2. Möbelstücke
             if (window.isWheelchairMode) return; 
             
             let movableEl = firstEl.closest('.movable');
             if (movableEl) {
                 this.grabbedEl = movableEl;
-                // Position sichern, falls der neue Platz blockiert ist
-                let pos = movableEl.getAttribute('position');
-                this.originalPos = { x: pos.x, y: pos.y, z: pos.z };
+                
+                // Position und Rotation via object3D sichern!
+                this.originalPos = { 
+                    x: movableEl.object3D.position.x, 
+                    y: movableEl.object3D.position.y, 
+                    z: movableEl.object3D.position.z 
+                };
+                this.originalRotY = movableEl.object3D.rotation.y;
                 
                 this.el.object3D.attach(this.grabbedEl.object3D);
             }
@@ -75,19 +99,26 @@ AFRAME.registerComponent('vr-controller', {
             if (this.grabbedEl) {
                 this.el.sceneEl.object3D.attach(this.grabbedEl.object3D);
                 
-                let currentPos = this.grabbedEl.getAttribute('position');
+                // 1. Zwangsbegradigung: Kippen (X und Z) auf 0 setzen!
+                let currentRot = this.grabbedEl.object3D.rotation;
+                this.grabbedEl.object3D.rotation.set(0, currentRot.y, 0);
+
+                // 2. Schweben verhindern: Y-Position strikt auf 0 setzen!
+                let currentPos = this.grabbedEl.object3D.position;
+                this.grabbedEl.object3D.position.set(currentPos.x, 0, currentPos.z);
+                
                 let isChair = this.grabbedEl.innerHTML.indexOf('height="0.45"') > -1;
                 let myRadius = isChair ? 0.4 : 0.8; 
                 
                 let hasCollision = false;
                 let collidables = document.querySelectorAll('.collidable');
                 
-                // Prüfe Abstand zu ALLEN anderen Möbelstücken
+                // Kollisionsprüfung mit object3D Koordinaten
                 for (let i = 0; i < collidables.length; i++) {
                     let otherEl = collidables[i];
-                    if (otherEl === this.grabbedEl) continue; // Sich selbst ignorieren
+                    if (otherEl === this.grabbedEl) continue;
                     
-                    let otherPos = otherEl.getAttribute('position');
+                    let otherPos = otherEl.object3D.position;
                     let dx = currentPos.x - otherPos.x;
                     let dz = currentPos.z - otherPos.z;
                     let distance = Math.sqrt(dx * dx + dz * dz);
@@ -95,19 +126,16 @@ AFRAME.registerComponent('vr-controller', {
                     let otherIsChair = otherEl.innerHTML.indexOf('height="0.45"') > -1;
                     let otherRadius = otherIsChair ? 0.4 : 0.8;
                     
-                    // Wenn die Radien sich überschneiden -> Kollision!
                     if (distance < (myRadius + otherRadius)) {
                         hasCollision = true;
                         break;
                     }
                 }
                 
+                // Zurücksetzen, falls Kollision besteht
                 if (hasCollision && this.originalPos) {
-                    // Platz besetzt -> Snappe zurück zum Start
-                    this.grabbedEl.setAttribute('position', { x: this.originalPos.x, y: 0, z: this.originalPos.z });
-                } else {
-                    // Platz frei -> Auf den Boden stellen
-                    this.grabbedEl.setAttribute('position', { x: currentPos.x, y: 0, z: currentPos.z });
+                    this.grabbedEl.object3D.position.set(this.originalPos.x, 0, this.originalPos.z);
+                    this.grabbedEl.object3D.rotation.set(0, this.originalRotY, 0);
                 }
                 
                 this.grabbedEl = null;
@@ -126,53 +154,37 @@ AFRAME.registerComponent('vr-controller', {
 // Komponente für Joycon-Bewegung in BEIDEN Modi mit dynamischer Kollisionserkennung
 AFRAME.registerComponent('joystick-movement', {
     init: function () {
-        this.moveY = 0;
-        this.turnX = 0;
         this.isTurning = false;
-    },
-    // play() wird ausgeführt, wenn das Element und seine Kinder im DOM bereit sind
-    play: function () {
-        let leftCtrl = document.getElementById('left-controller');
-        let rightCtrl = document.getElementById('right-controller');
-
-        if (leftCtrl) {
-            leftCtrl.addEventListener('thumbstickmoved', (evt) => {
-                this.moveY = evt.detail.y;
-            });
-        }
-        if (rightCtrl) {
-            rightCtrl.addEventListener('thumbstickmoved', (evt) => {
-                this.turnX = evt.detail.x;
-            });
-        }
+        window.moveY = 0; // Globale Joystick-Werte initialisieren
+        window.turnX = 0;
     },
     tick: function () {
         let rig = this.el;
         let camera = document.getElementById('player-camera');
         
+        let currentTurnX = window.turnX || 0;
+        let currentMoveY = window.moveY || 0;
+        
         // --- 1. ROTATION (Rechter Stick) via SNAP-TURN ---
-        if (Math.abs(this.turnX) > 0.6) {
+        if (Math.abs(currentTurnX) > 0.6) {
             if (!this.isTurning) {
-                let direction = this.turnX > 0 ? 1 : -1;
-                rig.object3D.rotation.y -= direction * (Math.PI / 4); // 45 Grad Drehung
+                let direction = currentTurnX > 0 ? 1 : -1;
+                rig.object3D.rotation.y -= direction * (Math.PI / 4);
                 this.isTurning = true;
             }
-        } else if (Math.abs(this.turnX) < 0.2) {
+        } else if (Math.abs(currentTurnX) < 0.2) {
             this.isTurning = false;
         }
 
         // --- 2. FORTBEWEGUNG (Linker Stick) ---
-        if (Math.abs(this.moveY) > 0.25) {
+        if (Math.abs(currentMoveY) > 0.25) {
             let direction = new THREE.Vector3();
-            // Holt den Vektor, in den das Headset schaut
             camera.object3D.getWorldDirection(direction);
             direction.y = 0; 
             direction.normalize();
             
             let speed = window.isWheelchairMode ? 0.03 : 0.05;
-            // Wenn man den Stick nach vorne drückt, ist moveY negativ (z.B. -1).
-            // Wir multiplizieren mit -this.moveY, um einen positiven Multiplikator für die Richtung zu erhalten.
-            let multiplier = -this.moveY * speed; 
+            let multiplier = -currentMoveY * speed; 
             
             let nextX = rig.object3D.position.x + (direction.x * multiplier);
             let nextZ = rig.object3D.position.z + (direction.z * multiplier);
