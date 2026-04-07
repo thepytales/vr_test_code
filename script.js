@@ -88,55 +88,59 @@ AFRAME.registerComponent('vr-controller', {
 // Komponente für Joycon-Bewegung in BEIDEN Modi mit dynamischer Kollisionserkennung
 AFRAME.registerComponent('joystick-movement', {
     init: function () {
-        this.moveAxis = 0; // Für den linken Controller (Bewegung)
-        this.turnAxis = 0; // Für den rechten Controller (Drehung)
-        
-        // Linker Controller = Laufen/Fahren
-        let leftController = document.getElementById('left-controller');
-        if (leftController) {
-            leftController.addEventListener('thumbstickmoved', (evt) => {
-                this.moveAxis = evt.detail.y;
-            });
-        }
+        this.moveY = 0;
+        this.turnX = 0;
+        this.isTurning = false; // Sperre für den Snap-Turn
 
-        // Rechter Controller = Drehen
-        let rightController = document.getElementById('right-controller');
-        if (rightController) {
-            rightController.addEventListener('thumbstickmoved', (evt) => {
-                this.turnAxis = evt.detail.x;
-            });
-        }
+        // Lauscht auf axismove direkt am Rig (sammelt alle Controller ein)
+        this.el.addEventListener('axismove', (evt) => {
+            let targetId = evt.target.id;
+            let axes = evt.detail.axis;
+
+            // Achse 0/1 sind der primäre Stick, Achse 2/3 tauchen manchmal je nach Browser-Mapping auf
+            if (targetId === 'left-controller') {
+                // Linker Controller: Suche den stärksten Y-Ausschlag (Vor/Zurück)
+                let yVal = Math.abs(axes[1]) > Math.abs(axes[3] || 0) ? axes[1] : (axes[3] || 0);
+                this.moveY = yVal;
+            } else if (targetId === 'right-controller') {
+                // Rechter Controller: Suche den stärksten X-Ausschlag (Links/Rechts)
+                let xVal = Math.abs(axes[0]) > Math.abs(axes[2] || 0) ? axes[0] : (axes[2] || 0);
+                this.turnX = xVal;
+            }
+        });
     },
-    tick: function (time, timeDelta) {
+    tick: function () {
         let rig = this.el;
         let camera = document.getElementById('player-camera');
         
-        // Verhindert extreme Sprünge bei Lag / Rucklern im Headset
-        if (timeDelta > 50) timeDelta = 50; 
-        
-        let turnInput = this.turnAxis;
-        let moveInput = this.moveAxis;
-        
-        // 1. Drehung (Rechter Stick)
-        if (Math.abs(turnInput) > 0.1) {
-            // Drastisch reduzierte Multiplikatoren für eine angenehme Drehung
-            let rotationSpeed = window.isWheelchairMode ? (0.001 * timeDelta) : (0.0015 * timeDelta);
-            rig.object3D.rotation.y -= turnInput * rotationSpeed;
+        // --- 1. ROTATION (Rechter Stick) via SNAP-TURN ---
+        // Snap-Turn macht wildes Kreiseln unmöglich
+        if (Math.abs(this.turnX) > 0.6) {
+            if (!this.isTurning) {
+                // Drehe einmalig hart um 45 Grad (Math.PI / 4)
+                let direction = this.turnX > 0 ? 1 : -1;
+                rig.object3D.rotation.y -= direction * (Math.PI / 4);
+                this.isTurning = true; // Blockieren, bis der Stick losgelassen wird
+            }
+        } else if (Math.abs(this.turnX) < 0.2) {
+            // Hebt die Sperre auf, wenn der Stick wieder nah der Mitte ist
+            this.isTurning = false;
         }
 
-        // 2. Fortbewegung (Linker Stick)
-        if (Math.abs(moveInput) > 0.1) {
-            // Holt den exakten Vektor, wohin das Headset in der Welt schaut
+        // --- 2. FORTBEWEGUNG (Linker Stick) ---
+        // Hohe Deadzone (25%), um versehentliches Bewegen / Stick-Drift komplett auszublenden
+        if (Math.abs(this.moveY) > 0.25) {
             let direction = new THREE.Vector3();
             camera.object3D.getWorldDirection(direction);
+            direction.y = 0; // Wir bleiben strikt auf dem Boden
+            direction.normalize();
             
-            // Angemessene Geschwindigkeiten
-            let speed = window.isWheelchairMode ? (0.0015 * timeDelta) : (0.0025 * timeDelta);
+            // Feste Geschwindigkeits-Werte pro Frame (ignoriert timeDelta komplett)
+            let speed = window.isWheelchairMode ? 0.03 : 0.05;
+            let moveAmount = this.moveY * -speed; // Negativ, weil nach vorne drücken auf Y oft -1 ergibt
             
-            // Wenn der Stick nach vorne gedrückt wird, ist moveInput negativ (-1).
-            // Daher multiplizieren wir mit -moveInput, um in Blickrichtung zu gehen.
-            let nextX = rig.object3D.position.x + (direction.x * -moveInput * speed);
-            let nextZ = rig.object3D.position.z + (direction.z * -moveInput * speed);
+            let nextX = rig.object3D.position.x + (direction.x * moveAmount);
+            let nextZ = rig.object3D.position.z + (direction.z * moveAmount);
             let canMove = true;
 
             // Wand-Kollision
@@ -156,8 +160,6 @@ AFRAME.registerComponent('joystick-movement', {
                     let distance = Math.sqrt(dx * dx + dz * dz);
                     
                     let isChair = el.innerHTML.indexOf('height="0.45"') > -1;
-                    
-                    // Im Rollstuhl ist die Hitbox breiter
                     let collisionRadius = window.isWheelchairMode ? (isChair ? 0.6 : 1.1) : (isChair ? 0.3 : 0.6);
 
                     if (distance < collisionRadius) {
