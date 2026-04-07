@@ -88,48 +88,64 @@ AFRAME.registerComponent('vr-controller', {
 // Komponente für Joycon-Bewegung in BEIDEN Modi mit dynamischer Kollisionserkennung
 AFRAME.registerComponent('joystick-movement', {
     init: function () {
-        this.axis = [0, 0];
+        this.moveAxis = 0; // Für den linken Controller (Bewegung)
+        this.turnAxis = 0; // Für den rechten Controller (Drehung)
         
-        // Oculus/Meta Controller nutzen 'thumbstickmoved' auf der Entität selbst
-        let addThumbstickListener = (controllerId) => {
-            let controller = document.getElementById(controllerId);
-            if (controller) {
-                controller.addEventListener('thumbstickmoved', (evt) => {
-                    this.axis[0] = evt.detail.x;
-                    this.axis[1] = evt.detail.y;
-                });
-            }
-        };
-        
-        addThumbstickListener('left-controller');
-        addThumbstickListener('right-controller');
+        // Linker Controller = Laufen/Fahren
+        let leftController = document.getElementById('left-controller');
+        if (leftController) {
+            leftController.addEventListener('thumbstickmoved', (evt) => {
+                this.moveAxis = evt.detail.y;
+            });
+        }
+
+        // Rechter Controller = Drehen
+        let rightController = document.getElementById('right-controller');
+        if (rightController) {
+            rightController.addEventListener('thumbstickmoved', (evt) => {
+                this.turnAxis = evt.detail.x;
+            });
+        }
     },
     tick: function (time, timeDelta) {
         let rig = this.el;
         let camera = document.getElementById('player-camera');
-        let x = this.axis[0]; // Links / Rechts Drehung
-        let y = this.axis[1]; // Vorwärts / Rückwärts
         
-        if (Math.abs(x) > 0.1) {
-            let rotationSpeed = window.isWheelchairMode ? (0.05 * timeDelta) : (0.08 * timeDelta);
-            rig.object3D.rotation.y -= x * rotationSpeed;
+        // Verhindert extreme Sprünge bei Lag / Rucklern im Headset
+        if (timeDelta > 50) timeDelta = 50; 
+        
+        let turnInput = this.turnAxis;
+        let moveInput = this.moveAxis;
+        
+        // 1. Drehung (Rechter Stick)
+        if (Math.abs(turnInput) > 0.1) {
+            // Drastisch reduzierte Multiplikatoren für eine angenehme Drehung
+            let rotationSpeed = window.isWheelchairMode ? (0.001 * timeDelta) : (0.0015 * timeDelta);
+            rig.object3D.rotation.y -= turnInput * rotationSpeed;
         }
 
-        if (Math.abs(y) > 0.1) {
-            let angle = camera.getAttribute('rotation').y;
-            let rad = angle * Math.PI / 180;
-            let speed = window.isWheelchairMode ? (0.003 * timeDelta) : (0.006 * timeDelta);
+        // 2. Fortbewegung (Linker Stick)
+        if (Math.abs(moveInput) > 0.1) {
+            // Holt den exakten Vektor, wohin das Headset in der Welt schaut
+            let direction = new THREE.Vector3();
+            camera.object3D.getWorldDirection(direction);
             
-            // Pluszeichen verwendet, da y negativ ist, wenn der Stick nach vorne gedrückt wird
-            let nextX = rig.object3D.position.x + Math.sin(rad) * y * speed;
-            let nextZ = rig.object3D.position.z + Math.cos(rad) * y * speed;
+            // Angemessene Geschwindigkeiten
+            let speed = window.isWheelchairMode ? (0.0015 * timeDelta) : (0.0025 * timeDelta);
+            
+            // Wenn der Stick nach vorne gedrückt wird, ist moveInput negativ (-1).
+            // Daher multiplizieren wir mit -moveInput, um in Blickrichtung zu gehen.
+            let nextX = rig.object3D.position.x + (direction.x * -moveInput * speed);
+            let nextZ = rig.object3D.position.z + (direction.z * -moveInput * speed);
             let canMove = true;
 
+            // Wand-Kollision
             let wallMargin = window.isWheelchairMode ? 5.5 : 5.8;
             if (nextX < -wallMargin || nextX > wallMargin || nextZ < -wallMargin || nextZ > wallMargin) {
                 canMove = false;
             }
 
+            // Möbel-Kollision
             if (canMove) {
                 let collidables = document.querySelectorAll('.collidable');
                 for (let i = 0; i < collidables.length; i++) {
@@ -140,13 +156,9 @@ AFRAME.registerComponent('joystick-movement', {
                     let distance = Math.sqrt(dx * dx + dz * dz);
                     
                     let isChair = el.innerHTML.indexOf('height="0.45"') > -1;
-                    let collisionRadius = 0;
-
-                    if (window.isWheelchairMode) {
-                        collisionRadius = isChair ? 0.6 : 1.1;
-                    } else {
-                        collisionRadius = isChair ? 0.3 : 0.6; 
-                    }
+                    
+                    // Im Rollstuhl ist die Hitbox breiter
+                    let collisionRadius = window.isWheelchairMode ? (isChair ? 0.6 : 1.1) : (isChair ? 0.3 : 0.6);
 
                     if (distance < collisionRadius) {
                         canMove = false;
