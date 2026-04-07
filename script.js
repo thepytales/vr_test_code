@@ -42,52 +42,58 @@ AFRAME.registerComponent('vr-controller', {
     init: function () {
         this.grabbedEl = null;
         
-        // Möbel greifen
-        this.el.addEventListener('triggerdown', () => {
+        // Funktion zum Greifen (wird für Trigger und Grip-Button genutzt)
+        const grabStart = () => {
             if (window.isWheelchairMode) return; // Greifen im Rollstuhl deaktiviert
             
             let raycaster = this.el.components.raycaster;
-            if (!raycaster) return;
+            if (!raycaster || !raycaster.intersectedEls || raycaster.intersectedEls.length === 0) return;
             
-            let intersectedEls = raycaster.intersectedEls;
-            if (intersectedEls.length > 0) {
-                let firstEl = intersectedEls[0];
-                if (firstEl.classList.contains('movable')) {
-                    this.grabbedEl = firstEl;
-                    // Hängt das Objekt an den Controller an (Three.js attach erhält die Weltposition)
-                    this.el.object3D.attach(this.grabbedEl.object3D);
-                }
+            let firstEl = raycaster.intersectedEls[0];
+            // Suche das nächste Eltern-Element mit der Klasse 'movable', 
+            // da der Laser oft die geometrischen Kinder (z.B. Tischbeine) trifft
+            let movableEl = firstEl.closest('.movable');
+            
+            if (movableEl) {
+                this.grabbedEl = movableEl;
+                // Hängt das Objekt an den Controller an
+                this.el.object3D.attach(this.grabbedEl.object3D);
             }
-        });
-        
-        // Möbel loslassen
-        this.el.addEventListener('triggerup', () => {
+        };
+
+        // Funktion zum Loslassen
+        const grabEnd = () => {
             if (this.grabbedEl) {
-                // Hängt das Objekt wieder an die Szene an
+                // Hängt das Objekt wieder an die Welt-Szene an
                 this.el.sceneEl.object3D.attach(this.grabbedEl.object3D);
                 
-                // Stelle sicher, dass die Objekte nicht durch den Boden fallen oder schweben
+                // Setze die Y-Achse hart auf 0, damit nichts schwebt
                 let currentPos = this.grabbedEl.getAttribute('position');
                 this.grabbedEl.setAttribute('position', {x: currentPos.x, y: 0, z: currentPos.z});
                 
                 this.grabbedEl = null;
             }
-        });
+        };
 
-        // Modus wechseln via A- oder X-Button an den Quest-Controllern
+        // Event-Listener für Quest 3 Controller (Zeigefinger & Mittelfinger)
+        this.el.addEventListener('triggerdown', grabStart);
+        this.el.addEventListener('squeezedown', grabStart);
+        this.el.addEventListener('triggerup', grabEnd);
+        this.el.addEventListener('squeezeup', grabEnd);
+
+        // Modus wechseln via A- oder X-Button
         this.el.addEventListener('xbuttondown', toggleMode);
         this.el.addEventListener('abuttondown', toggleMode);
     }
 });
 
-// Komponente für Joycon-Bewegung im Rollstuhl-Modus mit Kollisionserkennung
+// Komponente für Joycon-Bewegung in BEIDEN Modi mit dynamischer Kollisionserkennung
 AFRAME.registerComponent('joystick-movement', {
     init: function () {
         this.axis = [0, 0, 0, 0];
         
         // Lauscht auf Thumbstick-Eingaben beider Controller
         window.addEventListener('axismove', (evt) => {
-            if (!window.isWheelchairMode) return;
             if (evt.detail.axis.length >= 2) {
                 this.axis[0] = evt.detail.axis[0];
                 this.axis[1] = evt.detail.axis[1];
@@ -95,16 +101,14 @@ AFRAME.registerComponent('joystick-movement', {
         });
     },
     tick: function (time, timeDelta) {
-        if (!window.isWheelchairMode) return;
-        
         let rig = this.el;
         let camera = document.getElementById('player-camera');
         let x = this.axis[0]; // Links / Rechts Drehung
         let y = this.axis[1]; // Vorwärts / Rückwärts
         
-        // Drehung (separat berechnet, da Drehen am Platz im Rollstuhl meist erlaubt ist)
+        // Drehung (Im Stehen schneller drehen als im Rollstuhl)
         if (Math.abs(x) > 0.1) {
-            let rotationSpeed = 0.05 * timeDelta;
+            let rotationSpeed = window.isWheelchairMode ? (0.05 * timeDelta) : (0.08 * timeDelta);
             rig.object3D.rotation.y -= x * rotationSpeed;
         }
 
@@ -112,16 +116,17 @@ AFRAME.registerComponent('joystick-movement', {
         if (Math.abs(y) > 0.1) {
             let angle = camera.getAttribute('rotation').y;
             let rad = angle * Math.PI / 180;
-            let speed = 0.003 * timeDelta;
+            // Im Stehen sind wir schneller unterwegs
+            let speed = window.isWheelchairMode ? (0.003 * timeDelta) : (0.006 * timeDelta);
             
             // Berechne die angestrebte nächste Position
             let nextX = rig.object3D.position.x - Math.sin(rad) * y * speed;
             let nextZ = rig.object3D.position.z - Math.cos(rad) * y * speed;
             let canMove = true;
 
-            // 1. Raumgrenzen prüfen (Raum ist 12x12 Meter groß, Zentrum ist 0,0)
-            // Rollstuhl hat einen Radius, daher halten wir 0.5m Abstand zur Wand (-5.5 bis 5.5)
-            if (nextX < -5.5 || nextX > 5.5 || nextZ < -5.5 || nextZ > 5.5) {
+            // 1. Raumgrenzen prüfen (Abstand zur Wand je nach Modus)
+            let wallMargin = window.isWheelchairMode ? 5.5 : 5.8;
+            if (nextX < -wallMargin || nextX > wallMargin || nextZ < -wallMargin || nextZ > wallMargin) {
                 canMove = false;
             }
 
@@ -131,19 +136,24 @@ AFRAME.registerComponent('joystick-movement', {
                 for (let i = 0; i < collidables.length; i++) {
                     let el = collidables[i];
                     
-                    // Berechne Distanz auf der horizontalen XZ-Ebene (Y-Achse ignorieren)
+                    // Berechne Distanz auf der horizontalen XZ-Ebene
                     let dx = nextX - el.object3D.position.x;
                     let dz = nextZ - el.object3D.position.z;
                     let distance = Math.sqrt(dx * dx + dz * dz);
                     
-                    // Definiere den Kollisionsradius basierend auf dem Objekt
-                    // Tische und Lehrerpult brauchen einen größeren Radius als Stühle
-                    let isChair = el.innerHTML.indexOf('height="0.45"') > -1; // Einfacher Check für Stühle
-                    let collisionRadius = isChair ? 0.6 : 1.1;
+                    let isChair = el.innerHTML.indexOf('height="0.45"') > -1;
+                    let collisionRadius = 0;
+
+                    // Hitbox-Größen basierend auf Modus (Fußgänger kommen näher an Objekte heran)
+                    if (window.isWheelchairMode) {
+                        collisionRadius = isChair ? 0.6 : 1.1;
+                    } else {
+                        collisionRadius = isChair ? 0.3 : 0.6; 
+                    }
 
                     if (distance < collisionRadius) {
                         canMove = false;
-                        break; // Schleife abbrechen, da eine Kollision reicht
+                        break; 
                     }
                 }
             }
