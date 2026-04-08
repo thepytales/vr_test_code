@@ -108,12 +108,12 @@ AFRAME.registerComponent('vr-controller', {
                 this.grabbedEl.object3D.position.set(currentPos.x, 0, currentPos.z);
                 
                 let isChair = this.grabbedEl.innerHTML.indexOf('height="0.45"') > -1;
-                let myRadius = isChair ? 0.4 : 0.8; 
+                // STARK REDUZIERTE RADIEN für viel mehr Toleranz beim Abstellen
+                let myRadius = isChair ? 0.2 : 0.45; 
                 
                 let hasCollision = false;
                 let collidables = document.querySelectorAll('.collidable');
                 
-                // Kollisionsprüfung mit object3D Koordinaten
                 for (let i = 0; i < collidables.length; i++) {
                     let otherEl = collidables[i];
                     if (otherEl === this.grabbedEl) continue;
@@ -124,7 +124,7 @@ AFRAME.registerComponent('vr-controller', {
                     let distance = Math.sqrt(dx * dx + dz * dz);
                     
                     let otherIsChair = otherEl.innerHTML.indexOf('height="0.45"') > -1;
-                    let otherRadius = otherIsChair ? 0.4 : 0.8;
+                    let otherRadius = otherIsChair ? 0.2 : 0.45;
                     
                     if (distance < (myRadius + otherRadius)) {
                         hasCollision = true;
@@ -132,7 +132,7 @@ AFRAME.registerComponent('vr-controller', {
                     }
                 }
                 
-                // Zurücksetzen, falls Kollision besteht
+                // Zurücksetzen nur bei absolut offensichtlicher Kollision (ineinanderstellen)
                 if (hasCollision && this.originalPos) {
                     this.grabbedEl.object3D.position.set(this.originalPos.x, 0, this.originalPos.z);
                     this.grabbedEl.object3D.rotation.set(0, this.originalRotY, 0);
@@ -155,7 +155,7 @@ AFRAME.registerComponent('vr-controller', {
 AFRAME.registerComponent('joystick-movement', {
     init: function () {
         this.isTurning = false;
-        window.moveY = 0; // Globale Joystick-Werte initialisieren
+        window.moveY = 0;
         window.turnX = 0;
     },
     tick: function () {
@@ -184,7 +184,8 @@ AFRAME.registerComponent('joystick-movement', {
             direction.normalize();
             
             let speed = window.isWheelchairMode ? 0.03 : 0.05;
-            let multiplier = -currentMoveY * speed; 
+            // MINUS ENTFERNT: Jetzt stimmt die Joycon Richtung wieder
+            let multiplier = currentMoveY * speed; 
             
             let nextX = rig.object3D.position.x + (direction.x * multiplier);
             let nextZ = rig.object3D.position.z + (direction.z * multiplier);
