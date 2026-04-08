@@ -10,139 +10,178 @@
 <body>
     <a-scene id="scene" background="color: #87CEEB" proximity-sensor shadow="type: pcfsoft">
         
-        <a-light type="ambient" color="#ffffff" intensity="0.5"></a-light>
-        <a-light type="directional" position="2 4 3" castShadow="true" intensity="0.6" shadow-camera-top="10" shadow-camera-bottom="-10" shadow-camera-left="-10" shadow-camera-right="10" shadow-mapSize="1024 1024"></a-light>
+        <a-light type="ambient" color="#ffffff" intensity="0.55"></a-light>
+        <a-light type="directional" position="2 4 3" castShadow="true" intensity="0.5" shadow-camera-top="10" shadow-camera-bottom="-10" shadow-camera-left="-10" shadow-camera-right="10" shadow-mapSize="1024 1024"></a-light>
 
-        <a-entity id="player-rig" position="3 0 3" joystick-movement>
-            
+        <a-entity id="player-rig" position="8.5 0 -4.2" rotation="0 90 0" joystick-movement>
             <a-camera id="player-camera" position="0 1.6 0">
-                <a-text id="warning-text" value="Achtung: Weg zu eng!" visible="false" position="0 -0.2 -1" color="red" align="center" scale="0.4 0.4 0.4" font="mozillavr"></a-text>
-                
-                <a-entity id="wheelchair-mesh" visible="false" position="0 -1.1 0" rotation="0 180 0">
-                    <a-torus position="-0.35 0.3 -0.1" radius="0.3" radius-tubular="0.015" rotation="0 90 0" color="#111111"></a-torus>
-                    <a-torus position="0.35 0.3 -0.1" radius="0.3" radius-tubular="0.015" rotation="0 90 0" color="#111111"></a-torus>
-                    <a-torus position="-0.38 0.3 -0.1" radius="0.27" radius-tubular="0.005" rotation="0 90 0" color="#CCCCCC"></a-torus>
-                    <a-torus position="0.38 0.3 -0.1" radius="0.27" radius-tubular="0.005" rotation="0 90 0" color="#CCCCCC"></a-torus>
-                    <a-cylinder position="-0.25 0.1 0.4" radius="0.08" height="0.04" rotation="0 0 90" color="#222222"></a-cylinder>
-                    <a-cylinder position="0.25 0.1 0.4" radius="0.08" height="0.04" rotation="0 0 90" color="#222222"></a-cylinder>
-                    <a-box position="0 0.45 0.1" width="0.5" height="0.05" depth="0.5" color="#1A1A1A"></a-box>
-                    <a-box position="0 0.7 -0.15" width="0.5" height="0.5" depth="0.05" color="#1A1A1A"></a-box>
-                    <a-cylinder position="-0.25 0.25 0.4" radius="0.015" height="0.3" color="#444444"></a-cylinder>
-                    <a-cylinder position="0.25 0.25 0.4" radius="0.015" height="0.3" color="#444444"></a-cylinder>
-                    <a-cylinder position="-0.25 0.25 -0.1" radius="0.015" height="0.5" color="#444444"></a-cylinder>
-                    <a-cylinder position="0.25 0.25 -0.1" radius="0.015" height="0.5" color="#444444"></a-cylinder>
-                    <a-box position="-0.28 0.65 0.1" width="0.04" height="0.02" depth="0.35" color="#111111"></a-box>
-                    <a-box position="0.28 0.65 0.1" width="0.04" height="0.02" depth="0.35" color="#111111"></a-box>
-                    <a-box position="-0.15 0.15 0.45" width="0.15" height="0.02" depth="0.1" color="#111111" rotation="15 0 0"></a-box>
-                    <a-box position="0.15 0.15 0.45" width="0.15" height="0.02" depth="0.1" color="#111111" rotation="15 0 0"></a-box>
-                    <a-cylinder position="-0.25 0.95 -0.2" radius="0.015" height="0.1" rotation="90 0 0" color="#111111"></a-cylinder>
-                    <a-cylinder position="0.25 0.95 -0.2" radius="0.015" height="0.1" rotation="90 0 0" color="#111111"></a-cylinder>
-                </a-entity>
+                <a-text id="warning-text" value="Achtung: Weg zu eng!" visible="false" position="0 -0.2 -1" color="red" align="center" scale="0.4 0.4 0.4" font="https://cdn.aframe.io/fonts/DejaVu-sdf.fnt"></a-text>
             </a-camera>
 
-            <a-entity id="left-controller" laser-controls="hand: left" raycaster="objects: .movable *, .clickable *" vr-controller></a-entity>
-            <a-entity id="right-controller" laser-controls="hand: right" raycaster="objects: .movable *, .clickable *" vr-controller></a-entity>
-            
+            <a-entity id="wheelchair-mesh" visible="false" position="0 0.5 0" rotation="0 180 0">
+                <a-torus position="-0.35 0.3 -0.1" radius="0.3" radius-tubular="0.015" rotation="0 90 0" color="#111111"></a-torus>
+                <a-torus position="0.35 0.3 -0.1" radius="0.3" radius-tubular="0.015" rotation="0 90 0" color="#111111"></a-torus>
+                <a-torus position="-0.38 0.3 -0.1" radius="0.27" radius-tubular="0.005" rotation="0 90 0" color="#CCCCCC"></a-torus>
+                <a-torus position="0.38 0.3 -0.1" radius="0.27" radius-tubular="0.005" rotation="0 90 0" color="#CCCCCC"></a-torus>
+                <a-cylinder position="-0.25 0.1 0.4" radius="0.08" height="0.04" rotation="0 0 90" color="#222222"></a-cylinder>
+                <a-cylinder position="0.25 0.1 0.4" radius="0.08" height="0.04" rotation="0 0 90" color="#222222"></a-cylinder>
+                <a-box position="0 0.45 0.1" width="0.5" height="0.05" depth="0.5" color="#1A1A1A"></a-box>
+                <a-box position="0 0.7 -0.15" width="0.5" height="0.5" depth="0.05" color="#1A1A1A"></a-box>
+                <a-cylinder position="-0.25 0.25 0.4" radius="0.015" height="0.3" color="#444444"></a-cylinder>
+                <a-cylinder position="0.25 0.25 0.4" radius="0.015" height="0.3" color="#444444"></a-cylinder>
+                <a-cylinder position="-0.25 0.25 -0.1" radius="0.015" height="0.5" color="#444444"></a-cylinder>
+                <a-cylinder position="0.25 0.25 -0.1" radius="0.015" height="0.5" color="#444444"></a-cylinder>
+                <a-box position="-0.28 0.65 0.1" width="0.04" height="0.02" depth="0.35" color="#111111"></a-box>
+                <a-box position="0.28 0.65 0.1" width="0.04" height="0.02" depth="0.35" color="#111111"></a-box>
+                <a-box position="-0.15 0.15 0.45" width="0.15" height="0.02" depth="0.1" color="#111111" rotation="15 0 0"></a-box>
+                <a-box position="0.15 0.15 0.45" width="0.15" height="0.02" depth="0.1" color="#111111" rotation="15 0 0"></a-box>
+                <a-cylinder position="-0.25 0.95 -0.2" radius="0.015" height="0.1" rotation="90 0 0" color="#111111"></a-cylinder>
+                <a-cylinder position="0.25 0.95 -0.2" radius="0.015" height="0.1" rotation="90 0 0" color="#111111"></a-cylinder>
+            </a-entity>
+
+            <a-entity id="left-controller" laser-controls="hand: left" raycaster="objects: .movable, .clickable" vr-controller></a-entity>
+            <a-entity id="right-controller" laser-controls="hand: right" raycaster="objects: .movable, .clickable" vr-controller></a-entity>
         </a-entity>
 
         <a-plane position="0 0 0" rotation="-90 0 0" width="12" height="12" color="#A9B0B3" shadow="receive: true"></a-plane>
         <a-plane position="0 4 0" rotation="90 0 0" width="12" height="12" color="#FAFAFA"></a-plane>
-        
-        <a-box position="0 2 -6" width="12" height="4" depth="0.2" color="#F5F5DC" shadow="receive: true"></a-box>
-        <a-box position="0 2 6" width="12" height="4" depth="0.2" color="#F5F5DC" shadow="receive: true"></a-box>
-        <a-box position="-6 2 0" width="0.2" height="4" depth="12" color="#F5F5DC" shadow="receive: true"></a-box>
-        <a-box position="6 2 0" width="0.2" height="4" depth="12" color="#F5F5DC" shadow="receive: true"></a-box>
+        <a-box position="0 2 -6" width="12" height="4" depth="0.2" color="#E8DECC" shadow="receive: true"></a-box>
+        <a-box position="0 2 6" width="12" height="4" depth="0.2" color="#E8DECC" shadow="receive: true"></a-box>
+        <a-box position="-6 2 4" width="0.2" height="4" depth="4" color="#E8DECC" shadow="receive: true"></a-box>
+        <a-box position="-6 2 -4" width="0.2" height="4" depth="4" color="#E8DECC" shadow="receive: true"></a-box>
+        <a-box position="-6 0.25 0" width="0.2" height="0.5" depth="4" color="#E8DECC" shadow="receive: true"></a-box>
+        <a-box position="-6 3.25 0" width="0.2" height="1.5" depth="4" color="#E8DECC" shadow="receive: true"></a-box>
+        <a-box position="6 2 1.2" width="0.2" height="4" depth="9.6" color="#E8DECC" shadow="receive: true"></a-box>
+        <a-box position="6 2 -5.4" width="0.2" height="4" depth="1.2" color="#E8DECC" shadow="receive: true"></a-box>
+        <a-box position="6 3.4 -4.2" width="0.2" height="1.2" depth="1.2" color="#E8DECC" shadow="receive: true"></a-box>
+
+        <a-plane position="8 0 -4.2" rotation="-90 0 0" width="4" height="4" color="#6D7B8A" shadow="receive: true"></a-plane>
+        <a-plane position="8 4 -4.2" rotation="90 0 0" width="4" height="4" color="#EEEEEE"></a-plane>
+        <a-box position="10 2 -4.2" width="0.2" height="4" depth="4" color="#D3D3D3"></a-box>
+        <a-box position="8 2 -6.2" width="4" height="4" depth="0.2" color="#D3D3D3"></a-box>
+        <a-box position="8 2 -2.2" width="4" height="4" depth="0.2" color="#D3D3D3"></a-box>
+
+        <a-box class="collidable" position="6 1 1.2" width="0.5" height="2" depth="9.6" visible="false"></a-box>
+        <a-box class="collidable" position="6 1 -5.4" width="0.5" height="2" depth="1.2" visible="false"></a-box>
 
         <a-box position="0 2 -5.89" width="4" height="1.5" depth="0.05" color="#2E4A35" shadow="cast: true"></a-box>
         <a-box position="0 1.2 -5.85" width="4.2" height="0.05" depth="0.15" color="#8b5a2b" shadow="cast: true"></a-box>
 
-        <a-box position="5.89 1.4 -4" width="0.05" height="2.8" depth="1.2" color="#5C4033" shadow="cast: true"></a-box>
-        <a-sphere position="5.8 1.4 -4.4" radius="0.05" color="#DAA520"></a-sphere>
+        <a-entity position="-5.88 2 -4" rotation="0 90 0">
+            <a-box position="0 0 0" width="1.6" height="1.6" depth="0.02" color="#333"></a-box>
+            <a-plane position="0 0 0.02" width="1.5" height="1.5" color="#FFF"></a-plane>
+            <a-text value="Klassenregeln:\n1. Wir helfen uns\n2. Wir sind fair" align="center" position="0 0 0.03" color="#111" width="3"></a-text>
+        </a-entity>
 
-        <a-plane position="-5.89 2 0" rotation="0 90 0" width="6" height="1.8" color="#ADD8E6" opacity="0.4"></a-plane>
-        <a-box position="-5.89 2 -3" width="0.05" height="1.8" depth="0.1" color="#FFFFFF"></a-box>
-        <a-box position="-5.89 2 0" width="0.05" height="1.8" depth="0.1" color="#FFFFFF"></a-box>
-        <a-box position="-5.89 2 3" width="0.05" height="1.8" depth="0.1" color="#FFFFFF"></a-box>
+        <a-entity position="9.8 1.6 -4.2" rotation="0 -90 0">
+            <a-box width="3.0" height="1.6" depth="0.05" color="#2E4A35" shadow="cast: true"></a-box>
+            <a-box position="0 0 0.03" width="2.9" height="1.5" depth="0.05" color="#8b5a2b"></a-box>
+            <a-text position="0 0.5 0.06" value="Willkommen im inklusiven Klassenzimmer!" align="center" width="2.5" color="#FFFFFF" font="https://cdn.aframe.io/fonts/DejaVu-sdf.fnt"></a-text>
+            <a-text position="0 -0.2 0.06" value="Steuerung:\n- Fortbewegung: Linker Stick\n- Drehung: Rechter Stick\n- Modus wechseln: A- oder X-Button\n- Moebel greifen: Trigger (Zeigefinger)\n\nZiel: Raeume den Weg frei, sodass ein Rollstuhl\nin die blaue Zone am Tisch (Blick zur Tafel) passt!" align="center" width="2.3" color="#DDDDDD" font="https://cdn.aframe.io/fonts/DejaVu-sdf.fnt"></a-text>
+        </a-entity>
 
-        <a-plane position="3 0.01 3" rotation="-90 0 0" width="2" height="2" color="#00ff00" opacity="0.3"></a-plane>
-        <a-plane position="-3 0.01 -3" rotation="-90 0 0" width="2" height="2" color="#0000ff" opacity="0.3"></a-plane>
+        <a-entity position="-6 1.5 0" rotation="0 90 0">
+            <a-plane position="0 0 0" width="4" height="2" color="#ADD8E6" transparent="true" opacity="0.3"></a-plane>
+            
+            <a-box position="0 1 0" width="4" height="0.1" depth="0.1" color="#FFF"></a-box>
+            <a-box position="0 -1 0" width="4" height="0.1" depth="0.1" color="#FFF"></a-box>
+            <a-box position="-2 0 0" width="0.1" height="2.1" depth="0.1" color="#FFF"></a-box>
+            <a-box position="2 0 0" width="0.1" height="2.1" depth="0.1" color="#FFF"></a-box>
+            <a-box position="0 0 0" width="0.1" height="2" depth="0.1" color="#FFF"></a-box>
+            <a-box position="0 0 0" width="4" height="0.1" depth="0.1" color="#FFF"></a-box>
+        </a-entity>
+
+        <a-entity id="outdoor-scene">
+            <a-plane position="-16.1 0.01 0" rotation="-90 0 0" width="20" height="25" color="#3CB371"></a-plane>
+            
+            <a-sphere position="-20 12 -5" radius="2" color="#FFD700" material="emissive: #FFD700; emissiveIntensity: 0.6"></a-sphere>
+            
+            <a-entity position="-9 0 -2.5">
+                <a-cylinder position="0 1 0" radius="0.2" height="2" color="#8B4513"></a-cylinder>
+                <a-sphere position="0 2.5 0" radius="1.2" color="#228B22"></a-sphere>
+                <a-sphere position="-0.5 2 0.5" radius="1.0" color="#006400"></a-sphere>
+                <a-sphere position="0.5 2.2 -0.5" radius="1.1" color="#2E8B57"></a-sphere>
+            </a-entity>
+
+            <a-entity position="-11 0 2.5" rotation="0 110 0">
+                <a-cylinder position="-1.5 1 0" radius="0.05" height="2" color="#FFFFFF"></a-cylinder>
+                <a-cylinder position="1.5 1 0" radius="0.05" height="2" color="#FFFFFF"></a-cylinder>
+                <a-cylinder position="0 2 0" radius="0.05" height="3.1" rotation="0 0 90" color="#FFFFFF"></a-cylinder>
+                <a-box position="-1.5 0.05 -1" width="0.05" height="0.1" depth="2" color="#FFFFFF"></a-box>
+                <a-box position="1.5 0.05 -1" width="0.05" height="0.1" depth="2" color="#FFFFFF"></a-box>
+                <a-box position="0 0.05 -2" width="3.1" height="0.1" depth="0.05" color="#FFFFFF"></a-box>
+            </a-entity>
+        </a-entity>w
+
+        <a-entity id="door-hinge" position="5.89 1.4 -4.8" animation="property: rotation; to: 0 100 0; dur: 1500; startEvents: open-door">
+            <a-box position="0 0 0.6" width="0.05" height="2.8" depth="1.2" color="#5C4033" shadow="cast: true">
+                <a-entity class="clickable" id="start-btn-door" position="0.03 0.2 0" rotation="0 90 0">
+                    <a-box width="1.0" height="0.3" depth="0.02" color="#4CAF50"></a-box>
+                    <a-text position="0 0 0.02" value="Start" align="center" width="2" color="#FFFFFF" font="https://cdn.aframe.io/fonts/DejaVu-sdf.fnt"></a-text>
+                </a-entity>
+            </a-box>
+            <a-sphere position="0.05 0 1.0" radius="0.05" color="#DAA520"></a-sphere>
+            <a-sphere position="-0.05 0 1.0" radius="0.05" color="#DAA520"></a-sphere>
+        </a-entity>
+
+        <a-entity id="zone-1" class="target-zone" visible="false" position="-3.4 0.02 -1.7">
+            <a-plane rotation="-90 0 0" width="1.0" height="1.0" color="#0000FF" opacity="0.6"></a-plane>
+            <a-text value="Ziel" position="0 0.05 0" rotation="-90 0 0" align="center" color="#FFFFFF"></a-text>
+        </a-entity>
+        <a-entity id="zone-2" class="target-zone" visible="false" position="0.4 0.02 0.8">
+            <a-plane rotation="-90 0 0" width="1.0" height="1.0" color="#0000FF" opacity="0.6"></a-plane>
+            <a-text value="Ziel" position="0 0.05 0" rotation="-90 0 0" align="center" color="#FFFFFF"></a-text>
+        </a-entity>
+        <a-entity id="zone-3" class="target-zone" visible="false" position="2.6 0.02 3.3">
+            <a-plane rotation="-90 0 0" width="1.0" height="1.0" color="#0000FF" opacity="0.6"></a-plane>
+            <a-text value="Ziel" position="0 0.05 0" rotation="-90 0 0" align="center" color="#FFFFFF"></a-text>
+        </a-entity>
 
         <a-entity class="collidable" position="0 0 -4.5">
             <a-box position="0 0.9 0" width="2" height="0.1" depth="1" color="#8b5a2b" shadow="cast: true; receive: true"></a-box>
             <a-box position="-0.9 0.4 0" width="0.1" height="0.9" depth="0.9" color="#555555" shadow="cast: true"></a-box>
             <a-box position="0.9 0.4 0" width="0.1" height="0.9" depth="0.9" color="#555555" shadow="cast: true"></a-box>
-            <a-box position="0 0.4 -0.4" width="1.8" height="0.9" depth="0.1" color="#555555" shadow="cast: true"></a-box>
+            <a-box position="0 0.4 0.4" width="1.8" height="0.9" depth="0.1" color="#555555" shadow="cast: true"></a-box>
         </a-entity>
 
-        <a-entity class="movable collidable" position="-1.5 0 -1" rotation="0 15 0">
-            <a-box position="0 0.8 0" width="1.5" height="0.05" depth="0.8" color="#D2B48C" shadow="cast: true; receive: true"></a-box>
-            <a-cylinder position="-0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="-0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333" shadow="cast: true"></a-cylinder>
-        </a-entity>
+        <a-entity class="movable collidable" position="-3 0 -2.5"><a-box position="0 0.8 0" width="1.5" height="0.05" depth="0.8" color="#D2B48C"></a-box><a-cylinder position="-0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="-0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder></a-entity>
+        <a-entity class="movable collidable" position="0 0 -2.5"><a-box position="0 0.8 0" width="1.5" height="0.05" depth="0.8" color="#D2B48C"></a-box><a-cylinder position="-0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="-0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder></a-entity>
+        <a-entity class="movable collidable" position="3 0 -2.5"><a-box position="0 0.8 0" width="1.5" height="0.05" depth="0.8" color="#D2B48C"></a-box><a-cylinder position="-0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="-0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder></a-entity>
 
-        <a-entity class="movable collidable" position="1.5 0 -0.5" rotation="0 -10 0">
-            <a-box position="0 0.8 0" width="1.5" height="0.05" depth="0.8" color="#D2B48C" shadow="cast: true; receive: true"></a-box>
-            <a-cylinder position="-0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="-0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333" shadow="cast: true"></a-cylinder>
-        </a-entity>
+        <a-entity class="movable collidable" position="-3 0 0.0"><a-box position="0 0.8 0" width="1.5" height="0.05" depth="0.8" color="#D2B48C"></a-box><a-cylinder position="-0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="-0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder></a-entity>
+        <a-entity class="movable collidable" position="0 0 0.0"><a-box position="0 0.8 0" width="1.5" height="0.05" depth="0.8" color="#D2B48C"></a-box><a-cylinder position="-0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="-0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder></a-entity>
+        <a-entity class="movable collidable" position="3 0 0.0"><a-box position="0 0.8 0" width="1.5" height="0.05" depth="0.8" color="#D2B48C"></a-box><a-cylinder position="-0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="-0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder></a-entity>
 
-        <a-entity class="movable collidable" position="0.5 0 2" rotation="0 45 0">
-            <a-box position="0 0.8 0" width="1.5" height="0.05" depth="0.8" color="#D2B48C" shadow="cast: true; receive: true"></a-box>
-            <a-cylinder position="-0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="-0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333" shadow="cast: true"></a-cylinder>
-        </a-entity>
+        <a-entity class="movable collidable" position="-3 0 2.5"><a-box position="0 0.8 0" width="1.5" height="0.05" depth="0.8" color="#D2B48C"></a-box><a-cylinder position="-0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="-0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder></a-entity>
+        <a-entity class="movable collidable" position="0 0 2.5"><a-box position="0 0.8 0" width="1.5" height="0.05" depth="0.8" color="#D2B48C"></a-box><a-cylinder position="-0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="-0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder></a-entity>
+        <a-entity class="movable collidable" position="3 0 2.5"><a-box position="0 0.8 0" width="1.5" height="0.05" depth="0.8" color="#D2B48C"></a-box><a-cylinder position="-0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 -0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="-0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder><a-cylinder position="0.7 0.4 0.35" radius="0.03" height="0.8" color="#333333"></a-cylinder></a-entity>
 
-        <a-entity class="movable collidable" position="-1.5 0 -0.2" rotation="0 180 0">
-            <a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C" shadow="cast: true; receive: true"></a-box>
-            <a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C" shadow="cast: true"></a-box>
-        </a-entity>
+        <a-entity class="movable collidable" position="-3.4 0 -1.7" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        <a-entity class="movable collidable" position="-2.6 0 -1.7" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        
+        <a-entity class="movable collidable" position="-0.4 0 -1.7" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        <a-entity class="movable collidable" position="0.4 0 -1.7" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        
+        <a-entity class="movable collidable" position="2.6 0 -1.7" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        <a-entity class="movable collidable" position="3.4 0 -1.7" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
 
-        <a-entity class="movable collidable" position="1.2 0 0.3" rotation="0 160 0">
-            <a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C" shadow="cast: true; receive: true"></a-box>
-            <a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C" shadow="cast: true"></a-box>
-        </a-entity>
+        <a-entity class="movable collidable" position="-3.4 0 0.8" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        <a-entity class="movable collidable" position="-2.6 0 0.8" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        
+        <a-entity class="movable collidable" position="-0.4 0 0.8" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        <a-entity class="movable collidable" position="0.4 0 0.8" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        
+        <a-entity class="movable collidable" position="2.6 0 0.8" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        <a-entity class="movable collidable" position="3.4 0 0.8" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
 
-        <a-entity class="movable collidable" position="0.5 0 1.2" rotation="0 40 0">
-            <a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C" shadow="cast: true; receive: true"></a-box>
-            <a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222222" shadow="cast: true"></a-cylinder>
-            <a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C" shadow="cast: true"></a-box>
-        </a-entity>
-
-        <a-entity id="start-menu" position="3 1.6 1.5" rotation="0 0 0">
-            <a-box width="2.4" height="1.4" depth="0.05" color="#2E4A35" shadow="cast: true"></a-box>
-            <a-box position="0 0 -0.03" width="2.5" height="1.5" depth="0.05" color="#8b5a2b"></a-box>
-            
-            <a-text position="0 0.5 0.03" value="Willkommen im inklusiven Klassenzimmer!" align="center" width="2.2" color="#FFFFFF"></a-text>
-            <a-text position="0 0.1 0.03" value="Steuerung:\n- Fortbewegung: Thumbstick (Joycon)\n- Modus wechseln: A- oder X-Button\n- Moebel greifen: Trigger (Zeigefinger)\n\nZiel: Raeume den Weg fuer den Rollstuhl frei\nund erreiche die blaue Zielzone!" align="center" width="2" color="#DDDDDD"></a-text>
-            
-            <a-entity class="clickable" id="ok-button" position="0 -0.4 0.03">
-                <a-box width="0.8" height="0.25" depth="0.02" color="#4CAF50"></a-box>
-                <a-text position="0 0 0.02" value="OK, Start!" align="center" width="2" color="#FFFFFF"></a-text>
-            </a-entity>
-        </a-entity>
+        <a-entity class="movable collidable" position="-3.4 0 3.3" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        <a-entity class="movable collidable" position="-2.6 0 3.3" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        
+        <a-entity class="movable collidable" position="-0.4 0 3.3" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        <a-entity class="movable collidable" position="0.4 0 3.3" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        
+        <a-entity class="movable collidable" position="2.6 0 3.3" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
+        <a-entity class="movable collidable" position="3.4 0 3.3" rotation="0 0 0"><a-box position="0 0.45 0" width="0.4" height="0.05" depth="0.4" color="#D2B48C"></a-box><a-cylinder position="-0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 -0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="0.18 0.22 0.18" radius="0.02" height="0.45" color="#222"></a-cylinder><a-cylinder position="-0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-cylinder position="0.15 0.7 0.18" radius="0.015" height="0.5" color="#222"></a-cylinder><a-box position="0 0.85 0.18" width="0.4" height="0.2" depth="0.02" color="#D2B48C"></a-box></a-entity>
 
     </a-scene>
 </body>

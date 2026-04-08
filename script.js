@@ -42,15 +42,15 @@ AFRAME.registerComponent('vr-controller', {
     init: function () {
         this.grabbedEl = null;
         this.originalPos = null;
-        this.originalRotY = 0; // Speichert die Drehung
+        this.originalRotY = 0; 
 
-        // --- NEU: Globale Joystick-Daten direkt am Controller auslesen ---
         this.el.addEventListener('axismove', (evt) => {
             let axes = evt.detail.axis;
             if (!axes || axes.length < 2) return;
             
             if (this.el.id === 'left-controller') {
-                window.moveY = Math.abs(axes[1]) > 0.1 ? axes[1] : 0;
+                window.moveX = Math.abs(axes[0]) > 0.1 ? axes[0] : 0; 
+                window.moveY = Math.abs(axes[1]) > 0.1 ? axes[1] : 0; 
             } else if (this.el.id === 'right-controller') {
                 window.turnX = Math.abs(axes[0]) > 0.1 ? axes[0] : 0;
             }
@@ -58,6 +58,7 @@ AFRAME.registerComponent('vr-controller', {
 
         this.el.addEventListener('thumbstickmoved', (evt) => {
             if (this.el.id === 'left-controller') {
+                window.moveX = Math.abs(evt.detail.x) > 0.1 ? evt.detail.x : 0;
                 window.moveY = Math.abs(evt.detail.y) > 0.1 ? evt.detail.y : 0;
             } else if (this.el.id === 'right-controller') {
                 window.turnX = Math.abs(evt.detail.x) > 0.1 ? evt.detail.x : 0;
@@ -71,19 +72,28 @@ AFRAME.registerComponent('vr-controller', {
             let firstEl = raycaster.intersectedEls[0];
             
             let clickableEl = firstEl.closest('.clickable');
-            if (clickableEl && clickableEl.id === 'ok-button') {
-                document.getElementById('start-menu').setAttribute('visible', 'false');
+            if (clickableEl && clickableEl.id === 'start-btn-door') {
+                document.getElementById('door-hinge').emit('open-door');
+                clickableEl.setAttribute('visible', 'false');
                 clickableEl.classList.remove('clickable');
+                window.gameStarted = true; 
+
+                // Neue Logik: Zufällige Zielzone aktivieren
+                let zones = document.querySelectorAll('.target-zone');
+                if (zones.length > 0) {
+                    zones.forEach(z => z.setAttribute('visible', 'false'));
+                    let randomIndex = Math.floor(Math.random() * zones.length);
+                    zones[randomIndex].setAttribute('visible', 'true');
+                }
                 return;
             }
 
-            if (window.isWheelchairMode) return; 
+            if (window.isWheelchairMode || !window.gameStarted) return; 
             
             let movableEl = firstEl.closest('.movable');
             if (movableEl) {
                 this.grabbedEl = movableEl;
                 
-                // Position und Rotation via object3D sichern!
                 this.originalPos = { 
                     x: movableEl.object3D.position.x, 
                     y: movableEl.object3D.position.y, 
@@ -99,16 +109,13 @@ AFRAME.registerComponent('vr-controller', {
             if (this.grabbedEl) {
                 this.el.sceneEl.object3D.attach(this.grabbedEl.object3D);
                 
-                // 1. Zwangsbegradigung: Kippen (X und Z) auf 0 setzen!
                 let currentRot = this.grabbedEl.object3D.rotation;
                 this.grabbedEl.object3D.rotation.set(0, currentRot.y, 0);
 
-                // 2. Schweben verhindern: Y-Position strikt auf 0 setzen!
                 let currentPos = this.grabbedEl.object3D.position;
                 this.grabbedEl.object3D.position.set(currentPos.x, 0, currentPos.z);
                 
                 let isChair = this.grabbedEl.innerHTML.indexOf('height="0.45"') > -1;
-                // STARK REDUZIERTE RADIEN für viel mehr Toleranz beim Abstellen
                 let myRadius = isChair ? 0.2 : 0.45; 
                 
                 let hasCollision = false;
@@ -132,7 +139,6 @@ AFRAME.registerComponent('vr-controller', {
                     }
                 }
                 
-                // Zurücksetzen nur bei absolut offensichtlicher Kollision (ineinanderstellen)
                 if (hasCollision && this.originalPos) {
                     this.grabbedEl.object3D.position.set(this.originalPos.x, 0, this.originalPos.z);
                     this.grabbedEl.object3D.rotation.set(0, this.originalRotY, 0);
@@ -151,21 +157,25 @@ AFRAME.registerComponent('vr-controller', {
     }
 });
 
-// Komponente für Joycon-Bewegung in BEIDEN Modi mit dynamischer Kollisionserkennung
+// Komponente für Joycon-Bewegung mit Strafing und Flur-Grenzen
 AFRAME.registerComponent('joystick-movement', {
     init: function () {
         this.isTurning = false;
         window.moveY = 0;
+        window.moveX = 0;
         window.turnX = 0;
+        window.gameStarted = false; 
     },
     tick: function () {
+        if (!window.gameStarted) return;
+
         let rig = this.el;
         let camera = document.getElementById('player-camera');
         
         let currentTurnX = window.turnX || 0;
         let currentMoveY = window.moveY || 0;
+        let currentMoveX = window.moveX || 0;
         
-        // --- 1. ROTATION (Rechter Stick) via SNAP-TURN ---
         if (Math.abs(currentTurnX) > 0.6) {
             if (!this.isTurning) {
                 let direction = currentTurnX > 0 ? 1 : -1;
@@ -176,28 +186,38 @@ AFRAME.registerComponent('joystick-movement', {
             this.isTurning = false;
         }
 
-        // --- 2. FORTBEWEGUNG (Linker Stick) ---
-        if (Math.abs(currentMoveY) > 0.25) {
+        if (Math.abs(currentMoveY) > 0.25 || Math.abs(currentMoveX) > 0.25) {
             let direction = new THREE.Vector3();
             camera.object3D.getWorldDirection(direction);
             direction.y = 0; 
             direction.normalize();
             
+            let right = new THREE.Vector3(direction.z, 0, -direction.x);
             let speed = window.isWheelchairMode ? 0.03 : 0.05;
-            // MINUS ENTFERNT: Jetzt stimmt die Joycon Richtung wieder
-            let multiplier = currentMoveY * speed; 
             
-            let nextX = rig.object3D.position.x + (direction.x * multiplier);
-            let nextZ = rig.object3D.position.z + (direction.z * multiplier);
+            let mY = Math.abs(currentMoveY) > 0.25 ? currentMoveY : 0;
+            let mX = Math.abs(currentMoveX) > 0.25 ? currentMoveX : 0;
+
+            let forwardMult = mY * speed; 
+            let rightMult = mX * speed; 
+            
+            let nextX = rig.object3D.position.x + (direction.x * forwardMult) + (right.x * rightMult);
+            let nextZ = rig.object3D.position.z + (direction.z * forwardMult) + (right.z * rightMult);
             let canMove = true;
 
-            // Wand-Kollision
-            let wallMargin = window.isWheelchairMode ? 5.5 : 5.8;
-            if (nextX < -wallMargin || nextX > wallMargin || nextZ < -wallMargin || nextZ > wallMargin) {
+            let wallLeft = -5.8;
+            let wallRight = 9.8; 
+            let wallFront = -6.2;
+            let wallBack = 5.8;
+            
+            if (window.isWheelchairMode) {
+                wallLeft += 0.3; wallRight -= 0.3; wallFront += 0.3; wallBack -= 0.3;
+            }
+
+            if (nextX < wallLeft || nextX > wallRight || nextZ < wallFront || nextZ > wallBack) {
                 canMove = false;
             }
 
-            // Möbel-Kollision für den Spieler
             if (canMove) {
                 let collidables = document.querySelectorAll('.collidable');
                 for (let i = 0; i < collidables.length; i++) {
@@ -234,10 +254,8 @@ AFRAME.registerComponent('proximity-sensor', {
         let movables = document.querySelectorAll('.movable');
         let tooClose = false;
 
-        // Iteriere durch alle Möbelstücke und messe die Distanz zur Kamera (Rollstuhl)
         movables.forEach((el) => {
             let distance = camera.object3D.position.distanceTo(el.object3D.position);
-            // Wenn ein Objekt näher als 1.0 Meter zum Zentrum des Rollstuhls ist
             if (distance < 1.0) {
                 tooClose = true;
             }
