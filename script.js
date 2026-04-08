@@ -167,8 +167,6 @@ AFRAME.registerComponent('joystick-movement', {
         window.gameStarted = false; 
     },
     tick: function () {
-        if (!window.gameStarted) return;
-
         let rig = this.el;
         let camera = document.getElementById('player-camera');
         
