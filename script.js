@@ -1,4 +1,5 @@
 window.isWheelchairMode = false;
+window.gameStarted = false;
 
 // Funktion zum Wechseln zwischen Einrichtungs- und Rollstuhl-Modus
 function toggleMode() {
@@ -9,7 +10,6 @@ function toggleMode() {
     let warningText = document.getElementById('warning-text');
     
     if (window.isWheelchairMode) {
-        // Möbel loslassen, falls gerade etwas gegriffen wird
         controllers.forEach(c => {
             let controllerComponent = c.components['vr-controller'];
             if (controllerComponent && controllerComponent.grabbedEl) {
@@ -18,7 +18,6 @@ function toggleMode() {
             }
         });
         
-        // Rig absenken (simuliert Sitzhöhe von ca. 1.10m, wenn normale Höhe 1.60m ist)
         rig.setAttribute('position', {
             x: rig.object3D.position.x, 
             y: -0.5, 
@@ -26,7 +25,6 @@ function toggleMode() {
         });
         wheelchairMesh.setAttribute('visible', 'true');
     } else {
-        // Rig wieder auf normale Stehhöhe setzen
         rig.setAttribute('position', {
             x: rig.object3D.position.x, 
             y: 0, 
@@ -37,7 +35,7 @@ function toggleMode() {
     }
 }
 
-// Komponente für Controller-Interaktion (Greifen, UI, Buttons und Möbel-Kollision)
+// Komponente für Controller-Interaktion
 AFRAME.registerComponent('vr-controller', {
     init: function () {
         this.grabbedEl = null;
@@ -78,7 +76,12 @@ AFRAME.registerComponent('vr-controller', {
                 clickableEl.classList.remove('clickable');
                 window.gameStarted = true; 
 
-                // Neue Logik: Zufällige Zielzone aktivieren
+                // Tür-Blockade entfernen
+                let doorBlocker = document.getElementById('door-blocker');
+                if(doorBlocker) doorBlocker.setAttribute('visible', 'false');
+                if(doorBlocker) doorBlocker.classList.remove('collidable');
+
+                // Zufällige Zielzone aktivieren
                 let zones = document.querySelectorAll('.target-zone');
                 if (zones.length > 0) {
                     zones.forEach(z => z.setAttribute('visible', 'false'));
@@ -157,14 +160,13 @@ AFRAME.registerComponent('vr-controller', {
     }
 });
 
-// Komponente für Joycon-Bewegung mit Strafing und Flur-Grenzen
+// Komponente für Bewegung (Freigegeben, damit man zur Tür laufen kann)
 AFRAME.registerComponent('joystick-movement', {
     init: function () {
         this.isTurning = false;
         window.moveY = 0;
         window.moveX = 0;
         window.turnX = 0;
-        window.gameStarted = false; 
     },
     tick: function () {
         let rig = this.el;
@@ -220,6 +222,7 @@ AFRAME.registerComponent('joystick-movement', {
                 let collidables = document.querySelectorAll('.collidable');
                 for (let i = 0; i < collidables.length; i++) {
                     let el = collidables[i];
+                    if (el.getAttribute('visible') === 'false') continue; 
                     
                     let dx = nextX - el.object3D.position.x;
                     let dz = nextZ - el.object3D.position.z;
@@ -243,7 +246,7 @@ AFRAME.registerComponent('joystick-movement', {
     }
 });
 
-// Komponente für die Messung von Abständen zu Hindernissen
+// Proximity Sensor
 AFRAME.registerComponent('proximity-sensor', {
     tick: function () {
         if (!window.isWheelchairMode) return;
